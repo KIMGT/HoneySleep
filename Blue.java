@@ -15,6 +15,6 @@ public class Blue extends Activity {
         
         // 블루투스 활성화 시키는 메소드
         checkBluetooth();
-        }
+    }
 
 }
