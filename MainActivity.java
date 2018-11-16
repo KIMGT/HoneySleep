@@ -10,6 +10,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
+        TextView idText = (TextView)findViewById(R.id.idText);
+        TextView passwordText = (TextView)findViewById(R.id.passwordText);
+        TextView titleText = (TextView)findViewById(R.id.titleText);
+        Button bluetoothButton = (Button)findViewById(R.id.bluetoothButton);
+        Button getdataButton = (Button)findViewById(R.id.getdataButton);
+
+        Intent intent = getIntent();
+        String userID = intent.getStringExtra("userID");
+        String userPassword = intent.getStringExtra("userPassword");
+        String message = "환영합니다"+userID+"님";
+
+
+        idText.setText(userID);
+        passwordText.setText(userPassword);
+        titleText.setText(message);
+        
         Button bluetoothButton = (Button)findViewById(R.id.bluetoothButton);
         
     bluetoothButton.setOnClickListener(new View.OnClickListener() {
