@@ -1,5 +1,5 @@
 #include <SoftwareSerial.h>
-SoftwareSerial bt(2, 3);   //bluetooth module Tx:Digital 2 Rx:Digital 3
+SoftwareSerial bt(2, 3);   //bluetooth module Tx:Digital 3 Rx:Digital 2
 /*co2 sansor setup 부분 입니다. */
 #define MG_PIN (A0) //define which analog input channel you are going to use – A0 pin
 #define BOOL_PIN (9)    // D9 – Dout pin
