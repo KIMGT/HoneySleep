@@ -6,7 +6,7 @@ SoftwareSerial bt(3, 4);   //bluetooth module Tx:Digital 3 Rx:Digital 2
 #define REPORTING_PERIOD_MS     1000
 PulseOximeter pox;
 uint32_t tsLastReport = 0;
-int co2_v1,co2_v2,sleep=0;
+int co2_v1,co2_v2,sleep=0,count=0,spcont=0;
 int percentage,percentage_1;
 void onBeatDetected(){Serial.println("Beat!");}
 /*co2 sansor 부분 입니다. */
@@ -67,9 +67,8 @@ pinMode(BOOL_PIN_1, INPUT); //set pin to input
 digitalWrite(BOOL_PIN_1, HIGH); //turn on pullup resistors
 //Serial.print("MG-811 Demostration\n");
 
-MsTimer2::set(10000,co2air); // 10000ms period
+MsTimer2::set(1000,co2sub); // 10000ms period
   MsTimer2::start();
-  
 }
 void loop(){
   /*
@@ -86,6 +85,7 @@ void loop(){
         Serial.println("%");
         tsLastReport = millis();
     }  */
+     co2air();
      co2user();
     }
 float MGRead(int mg_pin){
@@ -162,9 +162,25 @@ if(percentage_1 == -1){
 }
 }
 void co2sub(){
-  if(abs(co2_v1-co2_v2) > 200){
-    sleep++;
+  count++;//co2sub 함수의 실행 횟수 카운트  
+  if(abs(co2_v1-co2_v2) < 150){
+    sleep++; // 무호흡 중으로 판단. 
   }else{
-    
+    sleep=0;   
   }
+ if(sleep >=10 &&count >=10){
+  spcont++;
+  bt.write("1\n");
+ }
+ if(spcont>= 5 || spcont> 15){
+  spcont++;
+  bt.write("1\n");
+ }else if( spcont>= 15 || spcont> 30 ){
+  spcont++;
+  bt.write("1\n");
+ }else{
+  spcont++;
+  bt.write("1\n");
+ }
+  
 }
