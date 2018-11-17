@@ -1,17 +1,19 @@
 #include <SoftwareSerial.h> //  
 #include <Wire.h>
+#include <MsTimer2.h>
 SoftwareSerial bt(3, 4);   //bluetooth module Tx:Digital 3 Rx:Digital 2
 #include "MAX30100_PulseOximeter.h"
 #define REPORTING_PERIOD_MS     1000
 PulseOximeter pox;
 uint32_t tsLastReport = 0;
-void onBeatDetected()
-{
-    Serial.println("Beat!");
-}
+int Hr=0,sat=-1;
+void onBeatDetected(){Serial.println("Beat!");}
 /*co2 sansor 부분 입니다. */
 #define MG_PIN (A0) //define which analog input channel you are going to use – A0 pin
 #define BOOL_PIN (9)    // D9 – Dout pin
+/*2번쨰 co2센서 */
+#define MG_PIN_1 (A1) //define which analog input channel you are going to use – A1 pin
+#define BOOL_PIN_1 (8)    // D8 – Dout pin 
 #define DC_GAIN (8.5) //define the DC gain of amplifier
 /***********************Software Related Macros************************************/
 #define READ_SAMPLE_INTERVAL (50) //define how many samples you are going to take in normal operation
@@ -19,8 +21,8 @@ void onBeatDetected()
 //normal operation
 /**********************Application Related Macros**********************************/
 //These two values differ from sensor to sensor. user should derermine this value.
-#define ZERO_POINT_VOLTAGE (0.13) //define the output of the sensor in volts wheY                                                         n the concentration of CO2 is 400PPM
-#define REACTION_VOLTGAE (0.31) //define the voltage drop of the sensor when move the sensor from air into 1000ppm CO2
+#define ZERO_POINT_VOLTAGE (0.15) //define the output of the sensor in volts wheY                                                         n the concentration of CO2 is 400PPM
+#define REACTION_VOLTGAE (0.30) //define the voltage drop of the sensor when move the sensor from air into 1000ppm CO2
 /*****************************Globals***********************************************/
 float CO2Curve[3] = {2.602,ZERO_POINT_VOLTAGE,(REACTION_VOLTGAE/(2.602-3))};
 //two points are taken from the curve.
@@ -40,9 +42,9 @@ void setup()
     // or wrong target chip
     if (!pox.begin()) {
         Serial.println("FAILED");
-        for(;;);
     } else {
         Serial.println("SUCCESS");
+        sat=0;
     }
 
     // The default current for the IR LED is 50mA and it could be changed
@@ -51,33 +53,40 @@ void setup()
     // pox.setIRLedCurrent(MAX30100_LED_CURR_7_6MA);
 
     // Register a callback for the beat detection
-   // pox.setOnBeatDetectedCallback(onBeatDetected);
+   pox.setOnBeatDetectedCallback(onBeatDetected);
 
      /*co2 sansor setup 부 입니다. */
      
 pinMode(BOOL_PIN, INPUT); //set pin to input
 digitalWrite(BOOL_PIN, HIGH); //turn on pullup resistors
-Serial.print("MG-811 Demostration\n");
+pinMode(BOOL_PIN_1, INPUT); //set pin to input
+digitalWrite(BOOL_PIN_1, HIGH); //turn on pullup resistors
+//Serial.print("MG-811 Demostration\n");
+
+MsTimer2::set(1000,co2); // 10000ms period
+  MsTimer2::start();
+  
 }
 
 void loop()
 {
+  Hr=pox.getHeartRate();
     // Make sure to call update as fast as possible
     pox.update();
-
     // Asynchronously dump heart rate and oxidation levels to the serial
     // For both, a value of 0 means "invalid"
-    if (millis() - tsLastReport > REPORTING_PERIOD_MS) {
+    if(Hr <150){
+
+       /if (millis() - tsLastReport > REPORTING_PERIOD_MS) {
         Serial.print("Heart rate:");
         Serial.print(pox.getHeartRate());
         Serial.print("bpm / SpO2:");
         Serial.print(pox.getSpO2());
         Serial.println("%");
-
         tsLastReport = millis();
     }
-
-   // co2();
+    
+    }
 }
 
 float MGRead(int mg_pin){
@@ -97,18 +106,19 @@ return -1;
 return pow(10, ((volts/DC_GAIN)-pcurve[1])/pcurve[2]+pcurve[0]);
 }
 }
-
 void co2(){
     /*co2 센서 입니다.*/
-int percentage;
+int percentage,percentage_1;
 float volts;
 volts = MGRead(MG_PIN);
+volts = MGRead(MG_PIN_1);
 Serial.print( "SEN-00007:" );
 Serial.print(volts);
 Serial.print( " V / before_amp : " );
 Serial.print(volts/DC_GAIN);
 Serial.print( " V " );
 percentage = MGGetPercentage(volts,CO2Curve);
+percentage_1 = MGGetPercentage(volts,CO2Curve);
 Serial.print("CO2:");
 if (percentage == -1) {
 Serial.print( "<400" );
@@ -117,6 +127,23 @@ Serial.print(percentage);
 }
 Serial.print( "ppm\n" );
 if (digitalRead(BOOL_PIN) ){
+Serial.println( "=====BOOL is HIGH======" );
+} else {
+Serial.println( "=====BOOL is LOW======" );
+}
+Serial.print(volts);
+Serial.print( " V / before_amp : " );
+Serial.print(volts/DC_GAIN);
+Serial.print( " V " );
+percentage = MGGetPercentage(volts,CO2Curve);
+percentage_1 = MGGetPercentage(volts,CO2Curve);
+Serial.print("CO2:");
+if (percentage == -1) {
+Serial.print( "<400" );
+} else {
+Serial.print(percentage);
+}
+if (digitalRead(BOOL_PIN_1) ){
 Serial.print( "=====BOOL is HIGH======" );
 } else {
 Serial.print( "=====BOOL is LOW======" );
