@@ -108,7 +108,6 @@ void co2(){
 int percentage,percentage_1;
 float volts,volts_1;
 volts = MGRead(MG_PIN);
-volts_1 = MGRead(MG_PIN_1);
 /*
 Serial.print( "SEN-00007:" );
 Serial.print(volts);
@@ -128,6 +127,7 @@ Serial.println( "=====BOOL is HIGH======" );
 } else {
 Serial.println( "=====BOOL is LOW======" );
 }*/
+volts_1 = MGRead(MG_PIN_1);
 Serial.print(volts_1);
 Serial.print( " V / before_amp : " );
 Serial.print(volts_1/DC_GAIN);
