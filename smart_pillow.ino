@@ -6,14 +6,16 @@ SoftwareSerial bt(3, 4);   //bluetooth module Tx:Digital 3 Rx:Digital 2
 #define REPORTING_PERIOD_MS     1000
 PulseOximeter pox;
 uint32_t tsLastReport = 0;
-int Hr=0,sat=-1;
+int co2_v1,co2_v2;
+int percentage,percentage_1;
 void onBeatDetected(){Serial.println("Beat!");}
 /*co2 sansor 부분 입니다. */
 #define MG_PIN (A0) //define which analog input channel you are going to use – A0 pin
 #define BOOL_PIN (9)    // D9 – Dout pin
 /*2번쨰 co2센서 */
-#define MG_PIN_1 (A1) //define which analog input channel you are going to use – A1 pin
-#define BOOL_PIN_1 (8)    // D8 – Dout pin 
+#define MG_PIN_1 (A2) //define which analog input channel you are going to use – A1 pin
+#define BOOL_PIN_1 (6)    // D8 – Dout pin 
+
 #define DC_GAIN (8.5) //define the DC gain of amplifier
 /***********************Software Related Macros************************************/
 #define READ_SAMPLE_INTERVAL (50) //define how many samples you are going to take in normal operation
@@ -21,10 +23,10 @@ void onBeatDetected(){Serial.println("Beat!");}
 //normal operation
 /**********************Application Related Macros**********************************/
 //These two values differ from sensor to sensor. user should derermine this value.
-#define ZERO_POINT_VOLTAGE (0.15) //define the output of the sensor in volts wheY                                                         n the concentration of CO2 is 400PPM
+#define ZERO_POINT_VOLTAGE (0.10) //define the output of the sensor in volts wheY                                                         n the concentration of CO2 is 400PPM
 #define REACTION_VOLTGAE (0.30) //define the voltage drop of the sensor when move the sensor from air into 1000ppm CO2
 /*2번쨰 co2센서 */
-#define ZERO_POINT_VOLTAGEA (0.15) //define the output of the sensor in volts wheY                                                         n the concentration of CO2 is 400PPM
+#define ZERO_POINT_VOLTAGEA (0.10) //define the output of the sensor in volts wheY                                                         n the concentration of CO2 is 400PPM
 #define REACTION_VOLTGAEA (0.30) //define the voltage drop of the sensor when move the sensor from air into 1000ppm CO2
 /*****************************Globals***********************************************/
 float CO2Curve[3] = {2.602,ZERO_POINT_VOLTAGE,(REACTION_VOLTGAE/(2.602-3))};
@@ -85,6 +87,16 @@ void loop(){
         Serial.println("%");
         tsLastReport = millis();
     }  */
+    if(percentage == -1){
+      co2_v1=
+    }else{
+      
+    }
+    if(percentage_1 == -1){
+      
+    }else{
+      
+    }
 }
 float MGRead(int mg_pin){
 int i;
@@ -104,12 +116,11 @@ return pow(10, ((volts/DC_GAIN)-pcurve[1])/pcurve[2]+pcurve[0]);
 }
 }
 void co2(){
-    /*co2 센서 입니다.*/
-int percentage,percentage_1;
 float volts,volts_1;
 volts = MGRead(MG_PIN);
-/*
-Serial.print( "SEN-00007:" );
+    /*co2 센서 입니다.*/
+
+//Serial.print( "SEN-00007:" );
 Serial.print(volts);
 Serial.print( " V / before_amp : " );
 Serial.print(volts/DC_GAIN);
@@ -118,6 +129,7 @@ percentage = MGGetPercentage(volts,CO2Curve);
 Serial.print("CO2:");
 if (percentage == -1) {
 Serial.print( "<400" );
+//Serial.print(percentage);
 } else {
 Serial.print(percentage);
 }
@@ -126,7 +138,8 @@ if (digitalRead(BOOL_PIN) ){
 Serial.println( "=====BOOL is HIGH======" );
 } else {
 Serial.println( "=====BOOL is LOW======" );
-}*/
+}
+Serial.println("============co2_2================");
 volts_1 = MGRead(MG_PIN_1);
 Serial.print(volts_1);
 Serial.print( " V / before_amp : " );
@@ -136,6 +149,7 @@ percentage_1 = MGGetPercentage(volts_1,CO2Curvea);
 Serial.print("CO2:");
 if (percentage == -1) {
 Serial.print( "<400" );
+//Serial.print(percentage_1 );
 } else {
 Serial.print(percentage_1);
 }
