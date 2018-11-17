@@ -24,11 +24,11 @@ void onBeatDetected(){Serial.println("Beat!");}
 #define ZERO_POINT_VOLTAGE (0.15) //define the output of the sensor in volts wheY                                                         n the concentration of CO2 is 400PPM
 #define REACTION_VOLTGAE (0.30) //define the voltage drop of the sensor when move the sensor from air into 1000ppm CO2
 /*2번쨰 co2센서 */
-#define ZERO_POINT_VOLTAGE_1 (0.15) //define the output of the sensor in volts wheY                                                         n the concentration of CO2 is 400PPM
-#define REACTION_VOLTGAE_1 (0.30) //define the voltage drop of the sensor when move the sensor from air into 1000ppm CO2
+#define ZERO_POINT_VOLTAGEA (0.15) //define the output of the sensor in volts wheY                                                         n the concentration of CO2 is 400PPM
+#define REACTION_VOLTGAEA (0.30) //define the voltage drop of the sensor when move the sensor from air into 1000ppm CO2
 /*****************************Globals***********************************************/
-float CO2Curve[3] = {2.602,ZERO_POINT_VOLTAGE_1,(REACTION_VOLTGAE/(2.602-3))};
-float CO2Curve_1[3] = {2.602,ZERO_POINT_VOLTAGE,REACTION_VOLTGAE_1/(2.602-3))};
+float CO2Curve[3] = {2.602,ZERO_POINT_VOLTAGE,(REACTION_VOLTGAE/(2.602-3))};
+float CO2Curvea[3] = { 2.602,ZERO_POINT_VOLTAGEA,(REACTION_VOLTGAEA/(2.602-3)) };
 //two points are taken from the curve.
 //with these two points, a line is formed which is
 //"approximately equivalent" to the original curve.
@@ -71,12 +71,12 @@ MsTimer2::set(1000,co2); // 10000ms period
   
 }
 void loop(){
+  /*
   Hr=pox.getHeartRate();
     // Make sure to call update as fast as possible
     pox.update();
     // Asynchronously dump heart rate and oxidation levels to the serial
     // For both, a value of 0 means "invalid"
-
        /if (millis() - tsLastReport > REPORTING_PERIOD_MS) {
         Serial.print("Heart rate:");
         Serial.print(pox.getHeartRate());
@@ -84,7 +84,7 @@ void loop(){
         Serial.print(pox.getSpO2());
         Serial.println("%");
         tsLastReport = millis();
-    }  
+    }  */
 }
 float MGRead(int mg_pin){
 int i;
@@ -109,6 +109,7 @@ int percentage,percentage_1;
 float volts,volts_1;
 volts = MGRead(MG_PIN);
 volts_1 = MGRead(MG_PIN_1);
+/*
 Serial.print( "SEN-00007:" );
 Serial.print(volts);
 Serial.print( " V / before_amp : " );
@@ -126,12 +127,12 @@ if (digitalRead(BOOL_PIN) ){
 Serial.println( "=====BOOL is HIGH======" );
 } else {
 Serial.println( "=====BOOL is LOW======" );
-}
+}*/
 Serial.print(volts_1);
 Serial.print( " V / before_amp : " );
-Serial.print(volts/DC_GAIN);
+Serial.print(volts_1/DC_GAIN);
 Serial.print( " V " );
-percentage_1 = MGGetPercentage(volts,CO2Curve);
+percentage_1 = MGGetPercentage(volts_1,CO2Curvea);
 Serial.print("CO2:");
 if (percentage == -1) {
 Serial.print( "<400" );
