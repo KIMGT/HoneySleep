@@ -171,16 +171,31 @@ void co2sub(){
  if(sleep >=10 &&count >=10){
   spcont++;
   bt.write("1\n");
+  sound();
  }
  if(spcont>= 5 || spcont> 15){
   spcont++;
   bt.write("1\n");
+  sound();
  }else if( spcont>= 15 || spcont> 30 ){
   spcont++;
   bt.write("1\n");
+  sound();
  }else{
   spcont++;
   bt.write("1\n");
+  sound();
  }
   
+}
+
+void sound(){
+      for(int i=0;i<10;i++){
+     for(int freq = 150; freq <=1800; freq = freq + 2) {
+    tone(sd, freq, 10);
+  }
+  for(int freq = 1800; freq <=150; freq = freq - 2) {
+   tone(sd, freq, 10);
+  }
+    }
 }
