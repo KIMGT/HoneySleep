@@ -26,9 +26,7 @@ public class Blue extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-
+        setContentView(R.layout.blue);
 
         bt = new BluetoothSPP(this); //Initializing
         if (!bt.isBluetoothAvailable()) { //블루투스 사용 불가
@@ -37,12 +35,13 @@ public class Blue extends AppCompatActivity {
                     , Toast.LENGTH_SHORT).show();
             finish();
         }
-
+        Intent intent = getIntent();
+        final String userID = intent.getStringExtra("userID");
+        Toast.makeText(Blue.this,"2지점"+userID,Toast.LENGTH_LONG).show();
         bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() { //데이터 수신
-            Intent intent = getIntent();
-            String userID = intent.getStringExtra("userID");
             public void onDataReceived(byte[] data, String message) {
-                //Toast.makeText(Blue.this, data.toString(), Toast.LENGTH_SHORT).show();
+
+                Toast.makeText(Blue.this, data.toString(), Toast.LENGTH_SHORT).show();
                 Response.Listener<String> responseListner = new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -65,7 +64,6 @@ public class Blue extends AppCompatActivity {
 
                     }
                 };
-
                 addClass registerRequest = new addClass(userID,responseListner);
                 RequestQueue queue = Volley.newRequestQueue(Blue.this);
                 queue.add(registerRequest);
@@ -90,7 +88,7 @@ public class Blue extends AppCompatActivity {
             }
         });
 
-        Button btnConnect = findViewById(R.id.bluetoothButton); //연결시도
+        Button btnConnect = findViewById(R.id.btnConnect); //연결시도
         btnConnect.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (bt.getServiceState() == BluetoothState.STATE_CONNECTED) {
@@ -101,8 +99,6 @@ public class Blue extends AppCompatActivity {
                 }
             }
         });
-
-
     }
 
     public void onDestroy() {
@@ -119,7 +115,7 @@ public class Blue extends AppCompatActivity {
             if (!bt.isServiceAvailable()) {
                 bt.setupService();
                 bt.startService(BluetoothState.DEVICE_OTHER); //DEVICE_ANDROID는 안드로이드 기기 끼리
-                //setup();
+                setup();
             }
         }
     }
@@ -141,7 +137,7 @@ public class Blue extends AppCompatActivity {
             if (resultCode == Activity.RESULT_OK) {
                 bt.setupService();
                 bt.startService(BluetoothState.DEVICE_OTHER);
-                //setup();
+                setup();
             } else {
                 Toast.makeText(getApplicationContext()
                         , "Bluetooth was not enabled."
