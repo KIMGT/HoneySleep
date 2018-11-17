@@ -1,6 +1,7 @@
 #include <SoftwareSerial.h> //  
 #include <Wire.h>
 #include <MsTimer2.h>
+#include "pitches.h"
 SoftwareSerial bt(3, 4);   //bluetooth module Tx:Digital 3 Rx:Digital 2
 #include "MAX30100_PulseOximeter.h"
 #define REPORTING_PERIOD_MS     1000
@@ -87,6 +88,8 @@ void loop(){
     }  */
      co2air();
      co2user();
+  Serial.print("sub : "); 
+  Serial.println(abs(co2_v1-co2_v2)); 
     }
 float MGRead(int mg_pin){
 int i;
@@ -106,53 +109,55 @@ return pow(10, ((volts/DC_GAIN)-pcurve[1])/pcurve[2]+pcurve[0]);
 }
 }
 void co2air(){
-    Serial.println("============co2================");
+  //  Serial.println("============co2================");
 float volts ;
 volts = MGRead(MG_PIN);
     /*co2 센서 입니다.*/
 
 //Serial.print( "SEN-00007:" );
-Serial.print(volts);
-Serial.print( " V / before_amp : " );
-Serial.print(volts/DC_GAIN);
-Serial.print( " V " );
+//Serial.print(volts);
+//Serial.print( " V / before_amp : " );
+//Serial.print(volts/DC_GAIN);
+//Serial.print( " V " );
 percentage = MGGetPercentage(volts,CO2Curve);
-Serial.print("CO2:");
+//Serial.print("CO2:");
 if (percentage == -1) {
-Serial.print( "<400" );
+//Serial.print( "<400" );
 //Serial.print(percentage);
 } else {
-Serial.print(percentage);
+//Serial.print(percentage);
 }
-Serial.print( "ppm\n" );
+//Serial.print( "ppm\n" );
 if (digitalRead(BOOL_PIN) ){
-Serial.println( "=====BOOL is HIGH======" );
+//Serial.println( "=====BOOL is HIGH======" );
 } else {
-Serial.println( "=====BOOL is LOW======" );
+//Serial.println( "=====BOOL is LOW======" );
 }
 co2_v1=percentage;
 }
 void co2user() {
   float volts_1;
-  Serial.println("============co2_2================");
+ // Serial.println("============co2_2================");
   volts_1 = MGRead(MG_PIN_1);
-Serial.print(volts_1);
-Serial.print( " V / before_amp : " );
-Serial.print(volts_1/DC_GAIN);
-Serial.print( " V " );
+//Serial.print(volts_1);
+//Serial.print( " V / before_amp : " );
+//Serial.print(volts_1/DC_GAIN);
+//Serial.print( " V " );
 percentage_1 = MGGetPercentage(volts_1,CO2Curvea);
-Serial.print("CO2:");
+
+//Serial.print("CO2:");
 if (percentage == -1) {
-Serial.print( "<400" );
+//Serial.print( "<400" );
+ co2_v2=-0;
 //Serial.print(percentage_1 );
 } else {
-Serial.print(percentage_1);
+//Serial.print(percentage_1);
 }
-Serial.print( "ppm\n" );
+//Serial.print( "ppm\n" );
 if (digitalRead(BOOL_PIN_1) ){
-Serial.print( "=====BOOL is HIGH======" );
+//Serial.print( "=====BOOL is HIGH======" );
 } else {
-Serial.print( "=====BOOL is LOW======" );
+//Serial.print( "=====BOOL is LOW======" );
 }
 Serial.print("\n");
 if(percentage_1 == -1){
@@ -162,9 +167,14 @@ if(percentage_1 == -1){
 }
 }
 void co2sub(){
-  count++;//co2sub 함수의 실행 횟수 카운트  
-  if(abs(co2_v1-co2_v2) < 150){
-    sleep++; // 무호흡 중으로 판단. 
+  //  Serial.println("============co2sub================");
+  count++;//co2sub 함수의 실행 횟수 카운트 
+     //Serial.print("실행횟수  :=:  ");
+     //Serial.println(count); 
+  if(abs(co2_v1-co2_v2) <=0 || abs(co2_v1-co2_v2) <=50){
+    sleep++; // 무호흡 중으로 판단.
+     //Serial.print("무호흡  :=:  ");
+     //Serial.println(sleep); 
   }else{
     sleep=0;   
   }
@@ -190,12 +200,12 @@ void co2sub(){
 }
 
 void sound(){
-      for(int i=0;i<10;i++){
+      for(int i=0;i<1000;i++){
      for(int freq = 150; freq <=1800; freq = freq + 2) {
-    tone(sd, freq, 10);
+    tone(12, freq, 10);
   }
   for(int freq = 1800; freq <=150; freq = freq - 2) {
-   tone(sd, freq, 10);
+   tone(12, freq, 10);
   }
     }
 }
