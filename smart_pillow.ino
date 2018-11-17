@@ -6,7 +6,7 @@ SoftwareSerial bt(3, 4);   //bluetooth module Tx:Digital 3 Rx:Digital 2
 #define REPORTING_PERIOD_MS     1000
 PulseOximeter pox;
 uint32_t tsLastReport = 0;
-int co2_v1,co2_v2;
+int co2_v1,co2_v2,sleep=0;
 int percentage,percentage_1;
 void onBeatDetected(){Serial.println("Beat!");}
 /*co2 sansor 부분 입니다. */
@@ -49,7 +49,6 @@ void setup(){
         Serial.println("FAILED");
     } else {
         Serial.println("SUCCESS");
-        sat=0;
     }
 
     // The default current for the IR LED is 50mA and it could be changed
@@ -68,7 +67,7 @@ pinMode(BOOL_PIN_1, INPUT); //set pin to input
 digitalWrite(BOOL_PIN_1, HIGH); //turn on pullup resistors
 //Serial.print("MG-811 Demostration\n");
 
-MsTimer2::set(1000,co2); // 10000ms period
+MsTimer2::set(10000,co2air); // 10000ms period
   MsTimer2::start();
   
 }
@@ -87,17 +86,8 @@ void loop(){
         Serial.println("%");
         tsLastReport = millis();
     }  */
-    if(percentage == -1){
-      co2_v1=
-    }else{
-      
+     co2user();
     }
-    if(percentage_1 == -1){
-      
-    }else{
-      
-    }
-}
 float MGRead(int mg_pin){
 int i;
 float v=0;
@@ -115,8 +105,9 @@ return -1;
 return pow(10, ((volts/DC_GAIN)-pcurve[1])/pcurve[2]+pcurve[0]);
 }
 }
-void co2(){
-float volts,volts_1;
+void co2air(){
+    Serial.println("============co2================");
+float volts ;
 volts = MGRead(MG_PIN);
     /*co2 센서 입니다.*/
 
@@ -139,8 +130,12 @@ Serial.println( "=====BOOL is HIGH======" );
 } else {
 Serial.println( "=====BOOL is LOW======" );
 }
-Serial.println("============co2_2================");
-volts_1 = MGRead(MG_PIN_1);
+co2_v1=percentage;
+}
+void co2user() {
+  float volts_1;
+  Serial.println("============co2_2================");
+  volts_1 = MGRead(MG_PIN_1);
 Serial.print(volts_1);
 Serial.print( " V / before_amp : " );
 Serial.print(volts_1/DC_GAIN);
@@ -160,4 +155,16 @@ Serial.print( "=====BOOL is HIGH======" );
 Serial.print( "=====BOOL is LOW======" );
 }
 Serial.print("\n");
+if(percentage_1 == -1){
+ co2_v2=-0; 
+}else{
+  co2_v2=percentage_1;
+}
+}
+void co2sub(){
+  if(abs(co2_v1-co2_v2) > 200){
+    sleep++;
+  }else{
+    
+  }
 }
